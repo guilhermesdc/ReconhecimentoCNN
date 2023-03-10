@@ -12,10 +12,7 @@ classes = {
     'fearful': 4,
     'disgusted': 5,
     'angry': 6,
-    'contempt': 7,
-    'none': 8,
-    'uncertain': 9,
-    'no-face': 10
+    'contempt': 7
 }
 
 def FER_2013_to_DataFrame(path_dataset, verbose=False):
@@ -40,7 +37,7 @@ def FER_2013_to_DataFrame(path_dataset, verbose=False):
             for file in os.listdir(path_dataset + dir + '/' + class_dir):
                 if file.endswith('.png'):
                     path = path_dataset + dir + '/' + class_dir + '/' + file
-                    df = pd.concat([df, pd.DataFrame({'path_img': [path], 'class': [classes[class_dir]]})], ignore_index=True)
+                    df = pd.concat([df, pd.DataFrame({'path_img': [path], 'class': int([classes[class_dir]])})], ignore_index=True)
 
     df = df.sort_values(by=['class'], ascending=True)
     df = df.reset_index(drop=True)
@@ -71,7 +68,7 @@ def AffectNet_to_DataFrame(path_dataset, verbose=False):
                     for file in os.listdir(path_dataset + dir + '/' + sub_dir):
                         if file.endswith('exp.npy'):
                             path = path_dataset + dir + '/' + sub_dir + '/' + file
-                            classe = np.load(path).tolist()[0]
+                            classe = int(np.load(path).tolist()[0])
                             image_number = file.split('_')[0]
                             image_path = path_dataset + dir + f'/images/{image_number}.jpg'
                             df = pd.concat([df, pd.DataFrame({'path_img': [image_path], 'class': [classe]})], ignore_index=True)
