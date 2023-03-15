@@ -15,49 +15,27 @@ classes = {
     'contempt': 7
 }
 
-def FER_2013_to_DataFrame(path_dataset, verbose=False):
-    df = pd.DataFrame(columns=['path_img', 'class'])
-
-    for file in os.listdir(path_dataset):
-        if file.endswith('.csv'):
-            path = path_dataset + file
-            if verbose:
-                print(f'----- Found a csv file -----')
-            df = pd.read_csv(path)
-            if verbose:
-                print(f'----- Finished processing-----')
-            return df
-
-    for dir in os.listdir(path_dataset):
-        if verbose:
-            print(f'----- Processing directory {dir} -----')
-        for class_dir in os.listdir(path_dataset + dir):
-            if verbose:
-                print(f'Getting data from the class {class_dir}...')
-            for file in os.listdir(path_dataset + dir + '/' + class_dir):
-                if file.endswith('.png'):
-                    path = path_dataset + dir + '/' + class_dir + '/' + file
-                    df = pd.concat([df, pd.DataFrame({'path_img': [path], 'class': int([classes[class_dir]])})], ignore_index=True)
-
-    df = df.sort_values(by=['class'], ascending=True)
-    df = df.reset_index(drop=True)
-    df.to_csv(path_dataset + 'fer2013.csv', index=False)
-    if verbose:
-        print(f'----- Finished processing csv saved in {path_dataset}fer2013.csv -----')
-    return df
-
 def AffectNet_to_DataFrame(path_dataset, verbose=False):
     df = pd.DataFrame(columns=['path_img', 'class'])
+    df_flipped = pd.DataFrame(columns=['path_img', 'class'])
 
     for file in os.listdir(path_dataset):
         if file.endswith('.csv'):
             path = path_dataset + file
             if verbose:
                 print(f'----- Found a csv file -----')
-            df = pd.read_csv(path)
-            if verbose:
-                print(f'----- Finished processing-----')
-            return df
+            if path.endswith('flipped.csv'):
+                df_flipped = pd.read_csv(path)
+                if verbose:
+                    print(f'----- Flipped csv loaded -----')
+            else:
+                df = pd.read_csv(path)
+                if verbose:
+                    print(f'----- Normal csv loaded -----')
+    if not df.empty and not df_flipped.empty:
+        if verbose:
+            print(f'----- Finished loading csv files -----')
+        return df, df_flipped
     
     for dir in os.listdir(path_dataset):
         if verbose:
@@ -71,14 +49,22 @@ def AffectNet_to_DataFrame(path_dataset, verbose=False):
                             classe = int(np.load(path).tolist()[0])
                             image_number = file.split('_')[0]
                             image_path = path_dataset + dir + f'/images/{image_number}.jpg'
+                            image_flipped_path = path_dataset + dir + f'/images/{image_number}_flipped.jpg'
                             df = pd.concat([df, pd.DataFrame({'path_img': [image_path], 'class': [classe]})], ignore_index=True)
+                            df_flipped = pd.concat([df_flipped, pd.DataFrame({'path_img': [image_flipped_path], 'class': [classe]})], ignore_index=True)
                             
     df = df.sort_values(by=['class'], ascending=True)
     df = df.reset_index(drop=True)
+
+    df_flipped = df_flipped.sort_values(by=['class'], ascending=True)
+    df_flipped = df_flipped.reset_index(drop=True)
+
     df.to_csv(path_dataset + 'AffectNet.csv', index=False)
+    df_flipped.to_csv(path_dataset + 'AffectNet_flipped.csv', index=False)
     if verbose:
         print(f'----- Finished processing csv saved in {path_dataset}AffectNet.csv -----')
-    return df
+        print(f'----- Finished processing flipped csv saved in {path_dataset}AffectNet_flipped.csv -----')
+    return df, df_flipped
 
 
 def display_dataframe(df, title, n_per_class=5):
