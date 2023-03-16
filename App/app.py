@@ -14,6 +14,13 @@ classes = {
 
 app = Flask(__name__)
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
 @app.route('/')
 def index():
     return jsonify({'message': 'Backend is working!'})
@@ -23,6 +30,7 @@ def image():
     image = request.files['image']
     emotion = get_emotion(image)
     return jsonify({'emotion': emotion})
+
 
 if __name__ == '__main__':
     app.run()
