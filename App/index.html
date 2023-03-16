@@ -11,6 +11,7 @@
             align-items: center;
             height: 100vh;
         }
+        
         #form {
             display: flex;
             flex-direction: column;
@@ -20,9 +21,22 @@
             padding: 20px;
             border-radius: 10px;
         }
+        
         button, input {
             margin: 10px;
         }
+
+        #uploaded-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+        }
+
+        #result {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -57,7 +71,7 @@
         <input type="file" id="image" name="image" accept="image/*">
         <img id="uploaded-image" src="">
         <button type="submit" id="submit">Submit</button>
-        <p id="result"></p>
+        <div id="result"></div>
     </div>
 
     <script>

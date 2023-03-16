@@ -21,12 +21,14 @@ def pre_process_image(img):
     if len(faces) > 0:
         x, y, w, h = faces[0]
         img = img[y:y + h, x:x + w]
-    img = cv2.GaussianBlur(img, (5, 5), 0)
-    img = cv2.resize(img, (48, 48), interpolation=cv2.INTER_CUBIC)
-    img = cv2.equalizeHist(img)
-    img = img.astype('float32') / 255
-    img = np.expand_dims(img, -1)
-    return img
+        img = cv2.GaussianBlur(img, (5, 5), 0)
+        img = cv2.resize(img, (48, 48), interpolation=cv2.INTER_CUBIC)
+        img = cv2.equalizeHist(img)
+        img = img.astype('float32') / 255
+        img = np.expand_dims(img, -1)
+        return img
+    else:
+        return None
 
 def get_emotion(img):
     img = img.read()
@@ -34,7 +36,7 @@ def get_emotion(img):
     img = cv2.imdecode(img, cv2.IMREAD_UNCHANGED)
     img = pre_process_image(img)
     if img is None:
-        return None
+        return 'No face detected'
     img = np.expand_dims(img, 0)
     model = tf.keras.models.load_model('cnn_model.h5')
     result = model.predict(img)
